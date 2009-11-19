@@ -76,7 +76,15 @@ end
 -- @param actions a list of actions to be added.
 function Task:enhance(prerequisites, actions)
 	for _, task in ipairs(prerequisites or {}) do
-		table.insert(self.prerequisites, task)
+		local hasPrerequisite = false
+		for _, prereq in ipairs(self.prerequisites) do
+			if prereq == task then
+				hasPrerequisite = true
+			end
+		end
+		if not hasPrerequisite then
+			table.insert(self.prerequisites, task)
+		end
 	end
 	for _, action in ipairs(actions or {}) do
 		table.insert(self.actions, action)

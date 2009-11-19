@@ -61,6 +61,7 @@ context("A Task", function()
 		third:invoke()
 		assert_equal(executedTasks[1], "first")
 		assert_error(executedTasks[2], "second")
+		assert_error(executedTasks[3], "third")
 	end)
 
 	it("should not execute on subsequent invocation", function()
@@ -92,5 +93,47 @@ context("A Task", function()
 		end)
 		task:invoke(wanted)
 		assert_equal(wanted, got)
+	end)
+end)
+
+-- Application tests
+context("An Application", function()
+	local application = nil
+	before(function ()
+		application = Lake.Application:new()
+	end)
+
+	it("should have zero tasks when created", function()
+		assert_equal(#application.tasks, 0)
+	end)
+
+	it("should track tasks", function()
+		application:defineTask("aTask")
+		assert_not_nil(application.tasks["aTask"])
+	end)
+
+	it("should pass arguments to its tasks when run", function()
+		local got = nil
+		local wanted = "foobar"
+		application:defineTask("default", nil, function(t, arg)
+			got = arg
+		end)
+		application:invokeTask("default[foobar]")
+		assert_equal(got, wanted)
+	end)
+
+	it("should correctly define prerequisites", function()
+		order = {}
+		action = function(t)
+			table.insert(order, t.name)
+		end
+		application:defineTask("task4", {"task3", "task2"}, action)
+		application:defineTask("task2", {"task1"}, action)
+		application:defineTask("task1", nil, action)
+		application:defineTask("task3", {"task2"}, action)
+		application:invokeTask("task4")
+		for num, task in ipairs(order) do
+			assert_equal(task, "task" .. num)
+		end
 	end)
 end)
