@@ -1,0 +1,94 @@
+Yet Another Build System? Seriously?
+====================================
+
+There are many build systems out there, with Make likely being the most
+popular. Make's strength is that it is highly flexible. It allows to define
+tasks, not just programs or libraries. This allows it to be used for almost
+anything. There are many (incompatible) versions of Make, and it depends on
+the system shell to execute commands. This introduces incompatibilities
+between platforms. Lake aims to have the same amount of flexibility, while
+being cross-platform. Rake is very similar in this regard, but it depends on
+Ruby, which is quite a large dependency, in contrast with Lua. Using Lua
+gives the same power that Rake has due to using Ruby, but with a much smaller
+dependency.
+
+In short, Lake is a minimal Lua build system, which aims to be flexible and
+cross platform.
+
+
+Features
+========
+
+Lake is in it's early stages of development, and thus does not have many
+features. However, this will not drastically change, as Lake aims to be
+simple. The real features should be provided by extensions.
+
+Lake currently supports:
+
+* Task definitions with prerequisites
+* Passing arguments to the invoked tasks (feature borrowed from Rake)
+
+
+To Do
+=====
+
+The following is a shortlist of features that Lake should have. Feel free to
+make suggestions, however keep in mind that Lake is meant to be simple and
+extensible. Some features should be implemented in Lake, while others (most)
+should be implemented as extensions.
+
+* A proper directed acyclic graph and topological sorting. The graph should
+  have hooks (inserted node, removed node, etc) so that extensions can
+  manipulate the graph easier.
+* Namespaces as in Rake. Namespaces are useful for grouping tasks and
+  avoiding name clashes.
+* Search parent directories for lakefiles if one is not found locally.
+
+
+Dependencies
+============
+
+* Lake >= 5.1
+* Telescope (for running tests)
+
+
+Getting It
+==========
+
+The easiest way to install lake is through luarocks:
+
+    luarocks install lake-scm-1.rockspec
+
+
+Example Lakefile
+================
+
+The following is a simple Lakefile:
+
+    task("doc", nil, function()
+        os.execute("luadoc -d doc *.lua")
+    end)
+
+    task("install", nil, function(task, destdir)
+        destdir = destdir or ""
+        local prefix = destdir .. "/usr/local"
+        local bindir = prefix .. "/bin"
+        os.execute("mkdir -p " .. bindir)
+        os.execute("install -m 755 foo " .. bindir)
+    end)
+
+Note that the `install` task accepts a parameter `destdir`. This parameter
+can be set when running lake, like so:
+
+    lake install[/opt]
+
+This would theoretically install "foo" in "/opt/usr/local/bin/foo".
+
+
+Hacking
+=======
+
+The main Git repository is at git://github.com/sebnow/lake.git. All
+contributions should be documented, thoroughly tested, and signed-off on by
+yourself. If you wish to send a pull request, please keep your commits in a
+separate topic branch.
