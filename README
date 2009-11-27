@@ -48,7 +48,7 @@ should be implemented as extensions.
 Dependencies
 ============
 
-* Lake >= 5.1
+* Lua >= 5.1
 * Telescope (for running tests)
 
 
